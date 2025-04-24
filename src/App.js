@@ -6,11 +6,33 @@ import StudentList from './StudentList';
 function App() {
   const [students, setStudents] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [pagination, setPagination] = useState({});
 
-  const fetchStudents = async () => {
-    const res = await axios.get('/students');
-    setStudents(res.data);
+  const fetchStudents = async (sortBy = 'name', order = 'asc', search = '', page = 1) => {
+    try {
+      const response = await axios.get('/students', {
+        params: { sort_by: sortBy, order: order, search: search, page: page }
+      });
+      console.log('API Response:', response.data); 
+      const data = response.data.data || [];
+      setStudents(Array.isArray(data) ? data : []);
+      setPagination({
+        current_page: response.data.current_page,
+        last_page: response.data.last_page,
+        per_page: response.data.per_page,
+        total: response.data.total,
+        links: response.data.links,
+      }); 
+    } catch (err) {
+      console.error('Error fetching students:', err);
+    }
   };
+
+  const handleSearch = async () => {
+    fetchStudents('name', 'asc', searchTerm); 
+  };
+
 
   useEffect(() => {
     fetchStudents();
@@ -18,10 +40,18 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Student Manager</h1>
-      <StudentForm fetchStudents={fetchStudents} editingStudent={editingStudent} setEditingStudent={setEditingStudent} />
-      <StudentList students={students} fetchStudents={fetchStudents} setEditingStudent={setEditingStudent} />
-    </div>
+    <StudentForm
+      fetchStudents={fetchStudents}
+      editingStudent={editingStudent}
+      setEditingStudent={setEditingStudent}
+    />
+    <StudentList
+      students={students}
+      fetchStudents={fetchStudents}
+      setEditingStudent={setEditingStudent}
+      pagination={pagination}
+    />
+  </div>
   );
 }
 
