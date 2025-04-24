@@ -7,9 +7,43 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Student::all());
+        $sortBy = $request->get('sort_by', 'name');
+        $order = $request->get('order', 'asc');
+        $search = $request->get('search', '');
+
+        $query = Student::query();
+
+        if ($search) {
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('major', 'like', "%$search%")
+              ->orWhere('age', 'like', "%$search%");
+        });
+        }
+
+        $students = $query->orderBy($sortBy, $order)->paginate(10);
+        return response()->json($students);
+    }
+
+    public function search(Request $request)
+    {
+        // $request->validate([
+        //     'name' => 'required|regex:/^[\pL\s]+$/u|max:255',
+        //     'email' => 'required|email|unique:students,email',
+        // ]);
+        // $query = Student::query();
+
+        // if ($request->has('name')) {
+        //     $query->where('name', 'like', '%' . $request->name . '%');
+        // }
+        // if ($request->has('email')) {
+        //     $query->where('email', 'like', '%' . $request->email . '%');
+        // }
+
+        // return response()->json($query->get());
     }
 
     public function show($id)
