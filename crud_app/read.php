@@ -24,7 +24,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <td><?php echo $user['name']; ?></td>
             <td><?php echo $user['email']; ?></td>
             <td>
-                <a href="update.php?id=<?php echo $user['id']; ?>">Edit</a>
+                <a href="update.php?id=<?php echo $user['id']; ?>"
+                onclick="return confirm('Are you sure change')">Edit</a>
                 <a href="delete.php?id=<?php echo $user['id']; ?>" 
                 onclick="return confirm('Are you sure delete?')" class="delete-link">Delete</a>
             </td>

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (empty($name)) {
         $errors[] = "Name cannot be empty";
-    } elseif (!preg_match("/^[a-zA-Z-' ]+$/", $name)) {
+    } elseif (!preg_match("/^[\p{L}\-' ]+$/u", $name)) {
         $errors[] = "Name can only contain letters, spaces, apostrophes and hyphens";
     }
 
